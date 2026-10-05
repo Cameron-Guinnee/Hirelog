@@ -24,6 +24,9 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/hirelog
       SPRING_DATASOURCE_USERNAME: hirelog
       SPRING_DATASOURCE_PASSWORD: hirelog
+      HIRELOG_USERNAME: ${HIRELOG_USERNAME:-me}
+      HIRELOG_PASSWORD: ${HIRELOG_PASSWORD:?set HIRELOG_PASSWORD in .env}
+      HIRELOG_JWT_SECRET: ${HIRELOG_JWT_SECRET:?set HIRELOG_JWT_SECRET (32+ chars) in .env}
     ports:
       - "8080:8080"
 

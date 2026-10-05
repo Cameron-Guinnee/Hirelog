@@ -22,6 +22,12 @@ management:
         include: health
 
 hirelog:
+  security:
+    # Single-user login. Set these via environment variables; the app refuses to start without them.
+    username: ${HIRELOG_USERNAME:}
+    password: ${HIRELOG_PASSWORD:}
+    jwt-secret: ${HIRELOG_JWT_SECRET:}
+    token-ttl: 12h
   scheduling:
     enabled: true
   follow-ups:
