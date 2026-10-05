@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: hirelog
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/hirelog}
+    username: ${SPRING_DATASOURCE_USERNAME:hirelog}
+    password: ${SPRING_DATASOURCE_PASSWORD:hirelog}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
