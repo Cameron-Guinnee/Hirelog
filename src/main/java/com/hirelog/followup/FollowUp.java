@@ -34,6 +34,9 @@ public class FollowUp extends AuditedEntity {
     @Column(name = "completed_at")
     private Instant completedAt;
 
+    @Column(name = "flagged_at")
+    private Instant flaggedAt;
+
     protected FollowUp() {
     }
 
@@ -45,6 +48,10 @@ public class FollowUp extends AuditedEntity {
 
     public boolean isCompleted() {
         return completedAt != null;
+    }
+
+    public boolean isFlagged() {
+        return flaggedAt != null;
     }
 
     public JobApplication getApplication() {
@@ -85,5 +92,13 @@ public class FollowUp extends AuditedEntity {
 
     public void setCompletedAt(Instant completedAt) {
         this.completedAt = completedAt;
+    }
+
+    public Instant getFlaggedAt() {
+        return flaggedAt;
+    }
+
+    public void setFlaggedAt(Instant flaggedAt) {
+        this.flaggedAt = flaggedAt;
     }
 }

@@ -35,6 +35,11 @@ public class FollowUpController {
         return service.list(applicationId, pending).stream().map(FollowUpResponse::from).toList();
     }
 
+    @GetMapping("/due")
+    public List<FollowUpResponse> due() {
+        return service.due().stream().map(FollowUpResponse::from).toList();
+    }
+
     @GetMapping("/{id}")
     public FollowUpResponse get(@PathVariable Long id) {
         return FollowUpResponse.from(service.get(id));

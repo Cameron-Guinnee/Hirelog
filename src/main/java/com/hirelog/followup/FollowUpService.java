@@ -2,6 +2,7 @@ package com.hirelog.followup;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -60,6 +61,9 @@ public class FollowUpService {
                 : applications.get(request.applicationId());
         followUp.setApplication(application);
         followUp.setContact(resolveContact(request.contactId()));
+        if (followUp.isFlagged() && request.dueOn().isAfter(LocalDate.now(clock))) {
+            followUp.setFlaggedAt(null);
+        }
         followUp.setDueOn(request.dueOn());
         followUp.setDescription(request.description());
         return followUp;
@@ -71,6 +75,21 @@ public class FollowUpService {
             followUp.setCompletedAt(Instant.now(clock));
         }
         return followUp;
+    }
+
+    /** Pending follow-ups the scheduler has flagged as due, oldest due date first. */
+    @Transactional(readOnly = true)
+    public List<FollowUp> due() {
+        return followUps.findByCompletedAtIsNullAndFlaggedAtIsNotNullOrderByDueOnAsc();
+    }
+
+    /** Flags every pending follow-up due today or earlier that is not flagged yet. */
+    public List<FollowUp> flagDue() {
+        Instant now = Instant.now(clock);
+        List<FollowUp> due = followUps.findByCompletedAtIsNullAndFlaggedAtIsNullAndDueOnLessThanEqual(
+                LocalDate.now(clock));
+        due.forEach(f -> f.setFlaggedAt(now));
+        return due;
     }
 
     public void delete(Long id) {

@@ -27,6 +27,8 @@ public final class FollowUpDtos {
             String description,
             boolean completed,
             Instant completedAt,
+            boolean flagged,
+            Instant flaggedAt,
             Instant createdAt,
             Instant updatedAt) {
 
@@ -34,6 +36,7 @@ public final class FollowUpDtos {
             return new FollowUpResponse(f.getId(), f.getApplication().getId(),
                     f.getContact() == null ? null : f.getContact().getId(),
                     f.getDueOn(), f.getDescription(), f.isCompleted(), f.getCompletedAt(),
+                    f.isFlagged(), f.getFlaggedAt(),
                     f.getCreatedAt(), f.getUpdatedAt());
         }
     }
