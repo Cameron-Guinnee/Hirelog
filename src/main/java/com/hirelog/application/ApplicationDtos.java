@@ -50,4 +50,20 @@ public final class ApplicationDtos {
                     a.getNotes(), a.getCreatedAt(), a.getUpdatedAt());
         }
     }
+
+    public record StatusChangeRequest(@NotNull ApplicationStatus status, String note) {
+    }
+
+    public record StatusChangeResponse(
+            Long id,
+            ApplicationStatus fromStatus,
+            ApplicationStatus toStatus,
+            Instant changedAt,
+            String note) {
+
+        static StatusChangeResponse from(StatusChange c) {
+            return new StatusChangeResponse(c.getId(), c.getFromStatus(), c.getToStatus(), c.getChangedAt(),
+                    c.getNote());
+        }
+    }
 }

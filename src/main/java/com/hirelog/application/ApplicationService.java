@@ -1,6 +1,7 @@
 package com.hirelog.application;
 
 import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -18,11 +19,14 @@ import com.hirelog.company.CompanyService;
 public class ApplicationService {
 
     private final JobApplicationRepository applications;
+    private final StatusChangeRepository statusChanges;
     private final CompanyService companies;
     private final Clock clock;
 
-    public ApplicationService(JobApplicationRepository applications, CompanyService companies, Clock clock) {
+    public ApplicationService(JobApplicationRepository applications, StatusChangeRepository statusChanges,
+            CompanyService companies, Clock clock) {
         this.applications = applications;
+        this.statusChanges = statusChanges;
         this.companies = companies;
         this.clock = clock;
     }
@@ -51,7 +55,33 @@ public class ApplicationService {
         } else if (status.isSubmitted()) {
             application.setAppliedOn(LocalDate.now(clock));
         }
-        return applications.save(application);
+        JobApplication saved = applications.save(application);
+        statusChanges.save(new StatusChange(saved, null, status, Instant.now(clock), null));
+        return saved;
+    }
+
+    /**
+     * Moves an application to a new status and appends the transition to its history.
+     * Setting the current status again is a no-op and records nothing.
+     */
+    public JobApplication changeStatus(Long id, ApplicationStatus newStatus, String note) {
+        JobApplication application = get(id);
+        ApplicationStatus previous = application.getStatus();
+        if (previous == newStatus) {
+            return application;
+        }
+        application.setStatus(newStatus);
+        if (newStatus.isSubmitted() && application.getAppliedOn() == null) {
+            application.setAppliedOn(LocalDate.now(clock));
+        }
+        statusChanges.save(new StatusChange(application, previous, newStatus, Instant.now(clock), note));
+        return application;
+    }
+
+    @Transactional(readOnly = true)
+    public List<StatusChange> history(Long id) {
+        get(id);
+        return statusChanges.findByApplicationIdOrderByChangedAtAscIdAsc(id);
     }
 
     public JobApplication update(Long id, UpdateApplicationRequest request) {
